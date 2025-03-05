@@ -22,6 +22,8 @@ class Lista_BasicaTest {
             resultado.add(iterador.next());
         }
         assertEquals(List.of(1, 3), resultado);
+        lista.add(null);
+        assertEquals(2,lista.getNumElementos());
     }
 
     @Test
@@ -50,5 +52,19 @@ class Lista_BasicaTest {
     @Test
     void getIterador() {
         //Testeado arriba
+    }
+    @Test
+    void setElemento() {
+        Lista_Basica<Integer> lista = new Lista_Basica<>(5);
+        lista.add(1);
+        lista.add(2);
+        lista.add(3);
+        lista.add(4);
+        lista.add(5);
+        assertEquals(5, lista.getNumElementos());
+        lista.setElemento(0,9);
+        Iterador<Integer> iterador = lista.getIterador();
+        assertEquals(9, iterador.next());
+        lista.setElemento(-1,8);
     }
 }
