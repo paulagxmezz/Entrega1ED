@@ -1,0 +1,156 @@
+﻿// Interfaz Lista<T>
+public interface Lista<T> {
+    boolean add(T elemento);
+    boolean delete(T elemento);
+    Iterador<T> getIterador();
+    int getNumElementos();
+}
+
+
+// Clase ElementoDoble<T> para la lista doblemente enlazada
+class ElementoDoble<T> {
+    T dato;
+    ElementoDoble<T> anterior;
+    ElementoDoble<T> siguiente;
+
+
+    public ElementoDoble(T dato) {
+        this.dato = dato;
+        this.anterior = null;
+        this.siguiente = null;
+    }
+}
+
+
+// Implementación de la lista doblemente enlazada
+class ListaDoblementeEnlazada<T> implements Lista<T> {
+    private ElementoDoble<T> cabeza;
+    private ElementoDoble<T> cola;
+    private int size;
+
+
+    public ListaDoblementeEnlazada() {
+        this.cabeza = null;
+        this.cola = null;
+        this.size = 0;
+    }
+
+
+    @Override
+    public boolean add(T elemento) {
+        ElementoDoble<T> nuevo = new ElementoDoble<>(elemento);
+        if (cabeza == null) {
+            cabeza = cola = nuevo;
+        } else {
+            cola.siguiente = nuevo;
+            nuevo.anterior = cola;
+            cola = nuevo;
+        }
+        size++;
+        return true;
+    }
+
+
+    @Override
+    public boolean delete(T elemento) {
+        ElementoDoble<T> actual = cabeza;
+        while (actual != null) {
+            if (actual.dato.equals(elemento)) {
+                if (actual.anterior != null) {
+                    actual.anterior.siguiente = actual.siguiente;
+                } else {
+                    cabeza = actual.siguiente;
+                }
+                if (actual.siguiente != null) {
+                    actual.siguiente.anterior = actual.anterior;
+                } else {
+                    cola = actual.anterior;
+                }
+                size--;
+                return true;
+            }
+            actual = actual.siguiente;
+        }
+        return false;
+    }
+
+
+    @Override
+    public Iterador<T> getIterador() {
+        return new IteradorListaDoblementeEnlazada();
+    }
+
+
+    @Override
+    public int getNumElementos() {
+        return size;
+    }
+
+
+    // Implementación del iterador para la lista doblemente enlazada
+    private class IteradorListaDoblementeEnlazada implements Iterador<T> {
+        private ElementoDoble<T> actual = cabeza;
+        private ElementoDoble<T> previo = null;
+
+
+        @Override
+        public boolean hasNext() {
+            return actual != null;
+        }
+
+
+        @Override
+        public T next() {
+            if (!hasNext()) {
+                throw new IllegalStateException("No hay más elementos");
+            }
+            T dato = actual.dato;
+            previo = actual;
+            actual = actual.siguiente;
+            return dato;
+        }
+
+
+        @Override
+        public void delete() {
+            if (previo == null) {
+                throw new IllegalStateException("Llamar a next() antes de eliminar");
+            }
+            ListaDoblementeEnlazada.this.delete(previo.dato);
+            previo = null;
+        }
+
+
+        // Métodos adicionales para listas doblemente enlazadas
+        public boolean hasPrevious() {
+            return previo != null;
+        }
+
+
+        public T previous() {
+            if (!hasPrevious()) {
+                throw new IllegalStateException("No hay elementos anteriores");
+            }
+            actual = previo;
+            previo = actual.anterior;
+            return actual.dato;
+        }
+    }
+}
+
+
+// Interfaz de Iterador<T>
+interface Iterador<T> {
+    boolean hasNext();
+    T next();
+    void delete();
+}
+
+
+Respuestas a las preguntas de los objetivos:
+1. ¿Se puede añadir una operación hasPrevious()y un previous()?
+ Sí, en una lista doblemente enlazada, cada nodo tiene una referencia al nodo anterior, lo que permite recorrer la lista en ambas direcciones.
+2. ¿Tiene sentido?
+ Sí, porque permite recorrer la lista hacia atrás sin necesidad de reiniciar desde el inicio.
+3. ¿Cómo se haría?
+ Se han agregado los métodos hasPrevious()y previous()en el iterador, permitiendo retroceder en la lista usando la referencia anterioren los nodos.

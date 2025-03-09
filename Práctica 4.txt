@@ -1,0 +1,105 @@
+﻿// Implementación de la clase ListaSimplementeEnlazada<T>
+class ListaSimplementeEnlazada<T> {
+    private static class Nodo<T> {
+        T dato;
+        Nodo<T> siguiente;
+        
+        public Nodo(T dato) {
+            this.dato = dato;
+            this.siguiente = null;
+        }
+    }
+    
+    private Nodo<T> cabeza;
+    private Nodo<T> cola;
+    private int size;
+    
+    public ListaSimplementeEnlazada() {
+        this.cabeza = null;
+        this.cola = null;
+        this.size = 0;
+    }
+    
+    public void agregarInicio(T elemento) {
+        Nodo<T> nuevo = new Nodo<>(elemento);
+        if (cabeza == null) {
+            cabeza = cola = nuevo;
+        } else {
+            nuevo.siguiente = cabeza;
+            cabeza = nuevo;
+        }
+        size++;
+    }
+    
+    public void agregarFinal(T elemento) {
+        Nodo<T> nuevo = new Nodo<>(elemento);
+        if (cola == null) {
+            cabeza = cola = nuevo;
+        } else {
+            cola.siguiente = nuevo;
+            cola = nuevo;
+        }
+        size++;
+    }
+    
+    public T eliminarInicio() {
+        if (cabeza == null) {
+            throw new IllegalStateException("Lista vacía");
+        }
+        T dato = cabeza.dato;
+        cabeza = cabeza.siguiente;
+        if (cabeza == null) {
+            cola = null;
+        }
+        size--;
+        return dato;
+    }
+    
+    public boolean estaVacia() {
+        return size == 0;
+    }
+}
+
+
+// Implementación de la pila usando ListaSimplementeEnlazada<T>
+class Pila<T> {
+    private ListaSimplementeEnlazada<T> lista;
+    
+    public Pila() {
+        this.lista = new ListaSimplementeEnlazada<>();
+    }
+    
+    public void push(T elemento) {
+        lista.agregarInicio(elemento);
+    }
+    
+    public T pop() {
+        return lista.eliminarInicio();
+    }
+    
+    public boolean estaVacia() {
+        return lista.estaVacia();
+    }
+}
+
+
+// Implementación de la cola usando ListaSimplementeEnlazada<T>
+class Cola<T> {
+    private ListaSimplementeEnlazada<T> lista;
+    
+    public Cola() {
+        this.lista = new ListaSimplementeEnlazada<>();
+    }
+    
+    public void enqueue(T elemento) {
+        lista.agregarFinal(elemento);
+    }
+    
+    public T dequeue() {
+        return lista.eliminarInicio();
+    }
+    
+    public boolean estaVacia() {
+        return lista.estaVacia();
+    }
+}

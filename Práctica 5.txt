@@ -1,0 +1,161 @@
+﻿// Clase ElementoDiccionario<K, V>
+class ElementoDiccionario<K, V> {
+    K clave;
+    V valor;
+
+
+    public ElementoDiccionario(K clave, V valor) {
+        this.clave = clave;
+        this.valor = valor;
+    }
+}
+
+
+// Implementación de la lista doblemente enlazada
+class ListaDoblementeEnlazada<T> {
+    private class Nodo {
+        T dato;
+        Nodo anterior, siguiente;
+
+
+        public Nodo(T dato) {
+            this.dato = dato;
+        }
+    }
+
+
+    private Nodo cabeza, cola;
+    private int size;
+
+
+    public void agregarFinal(T dato) {
+        Nodo nuevo = new Nodo(dato);
+        if (cola == null) {
+            cabeza = cola = nuevo;
+        } else {
+            cola.siguiente = nuevo;
+            nuevo.anterior = cola;
+            cola = nuevo;
+        }
+        size++;
+    }
+
+
+    public boolean eliminar(T dato) {
+        Nodo actual = cabeza;
+        while (actual != null) {
+            if (actual.dato.equals(dato)) {
+                if (actual.anterior != null) actual.anterior.siguiente = actual.siguiente;
+                else cabeza = actual.siguiente;
+                if (actual.siguiente != null) actual.siguiente.anterior = actual.anterior;
+                else cola = actual.anterior;
+                size--;
+                return true;
+            }
+            actual = actual.siguiente;
+        }
+        return false;
+    }
+
+
+    public Iterador<T> getIterador() {
+        return new IteradorListaDoblementeEnlazada();
+    }
+
+
+    private class IteradorListaDoblementeEnlazada implements Iterador<T> {
+        private Nodo actual = cabeza;
+
+
+        @Override
+        public boolean hasNext() {
+            return actual != null;
+        }
+
+
+        @Override
+        public T next() {
+            if (!hasNext()) throw new IllegalStateException("No hay más elementos");
+            T dato = actual.dato;
+            actual = actual.siguiente;
+            return dato;
+        }
+
+
+        @Override
+        public void delete() {
+            throw new UnsupportedOperationException("Eliminar desde el iterador no implementado");
+        }
+    }
+}
+
+
+// Implementación del diccionario básico
+class DiccionarioBasico<K, V> {
+    private ListaDoblementeEnlazada<ElementoDiccionario<K, V>> lista;
+
+
+    public DiccionarioBasico() {
+        this.lista = new ListaDoblementeEnlazada<>();
+    }
+
+
+    public void put(K clave, V valor) {
+        lista.agregarFinal(new ElementoDiccionario<>(clave, valor));
+    }
+
+
+    public V get(K clave) {
+        Iterador<ElementoDiccionario<K, V>> iterador = lista.getIterador();
+        while (iterador.hasNext()) {
+            ElementoDiccionario<K, V> elemento = iterador.next();
+            if (elemento.clave.equals(clave)) {
+                return elemento.valor;
+            }
+        }
+        return null;
+    }
+}
+
+
+// Implementación del diccionario ordenado
+class DiccionarioOrdenado<K extends Comparable<K>, V> {
+    private ListaDoblementeEnlazada<ElementoDiccionario<K, V>> lista;
+
+
+    public DiccionarioOrdenado() {
+        this.lista = new ListaDoblementeEnlazada<>();
+    }
+
+
+    public void put(K clave, V valor) {
+        ElementoDiccionario<K, V> nuevo = new ElementoDiccionario<>(clave, valor);
+        Iterador<ElementoDiccionario<K, V>> iterador = lista.getIterador();
+        ListaDoblementeEnlazada<ElementoDiccionario<K, V>> nuevaLista = new ListaDoblementeEnlazada<>();
+
+
+        boolean agregado = false;
+        while (iterador.hasNext()) {
+            ElementoDiccionario<K, V> actual = iterador.next();
+            if (!agregado && clave.compareTo(actual.clave) < 0) {
+                nuevaLista.agregarFinal(nuevo);
+                agregado = true;
+            }
+            nuevaLista.agregarFinal(actual);
+        }
+        if (!agregado) nuevaLista.agregarFinal(nuevo);
+        lista = nuevaLista;
+    }
+
+
+    public V get(K clave) {
+        Iterador<ElementoDiccionario<K, V>> iterador = lista.getIterador();
+        while (iterador.hasNext()) {
+            ElementoDiccionario<K, V> elemento = iterador.next();
+            if (elemento.clave.equals(clave)) {
+                return elemento.valor;
+            }
+        }
+        return null;
+    }
+}
